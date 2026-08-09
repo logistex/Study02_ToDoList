@@ -66,12 +66,58 @@
   .badge-work { background: var(--work); }
   .badge-personal { background: var(--personal); }
   .badge-study { background: var(--study); }
+
+  #input-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  #todo-input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  #input-row input,
+  #input-row select,
+  #input-row button {
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-size: 15px;
+    font-family: inherit;
+  }
+
+  #add-btn {
+    flex: none;
+    border-color: var(--work);
+    background: var(--work);
+    color: #fff;
+    cursor: pointer;
+  }
+
+  #todo-list li.empty {
+    display: block;
+    padding: 32px 0;
+    border-bottom: none;
+    color: var(--muted);
+    text-align: center;
+  }
 </style>
 
 <h1>할 일 관리</h1>
 
 <div id="progress"></div>
-<div id="input-row"></div>
+
+<div id="input-row">
+  <input id="todo-input" type="text" placeholder="할 일을 입력하세요">
+  <select id="category-select">
+    <option value="work">업무</option>
+    <option value="personal">개인</option>
+    <option value="study">공부</option>
+  </select>
+  <button id="add-btn">추가</button>
+</div>
+
 <div id="filters"></div>
 
 <ul id="todo-list"></ul>
@@ -101,9 +147,40 @@
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 1, todos }));
   }
 
+  function addTodo() {
+    const input = document.getElementById("todo-input");
+    const text = input.value.trim();
+    if (text === "") {
+      input.focus();
+      return;
+    }
+
+    todos.unshift({
+      id: createId(),
+      text: text,
+      category: document.getElementById("category-select").value,
+      done: false,
+      createdAt: Date.now()
+    });
+
+    saveTodos();
+    render();
+
+    input.value = "";
+    input.focus();
+  }
+
   function renderList() {
     const list = document.getElementById("todo-list");
     list.innerHTML = "";
+
+    if (todos.length === 0) {
+      const empty = document.createElement("li");
+      empty.className = "empty";
+      empty.textContent = "할 일을 추가해 보세요";
+      list.append(empty);
+      return;
+    }
 
     todos.forEach(function (todo) {
       const li = document.createElement("li");
@@ -124,6 +201,12 @@
   function render() {
     renderList();
   }
+
+  document.getElementById("add-btn").addEventListener("click", addTodo);
+
+  document.getElementById("todo-input").addEventListener("keydown", function (e) {
+    if (e.key === "Enter") addTodo();
+  });
 
   loadTodos();
   render();
