@@ -33,6 +33,48 @@
     margin-bottom: 16px;
   }
 
+  #progress-bar {
+    height: 8px;
+    border-radius: 999px;
+    background: var(--line);
+    overflow: hidden;
+  }
+
+  #progress-fill {
+    width: 0;
+    height: 100%;
+    border-radius: 999px;
+    background: var(--work);
+  }
+
+  #progress-text {
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  #filters {
+    display: flex;
+    gap: 6px;
+  }
+
+  #filters button {
+    padding: 6px 14px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: #fff;
+    color: #4a5058;
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  #filters button.active {
+    border-color: var(--work);
+    background: var(--work);
+    color: #fff;
+  }
+
   #todo-list {
     list-style: none;
     margin: 0;
@@ -134,7 +176,10 @@
 
 <h1>할 일 관리</h1>
 
-<div id="progress"></div>
+<div id="progress">
+  <div id="progress-bar"><div id="progress-fill"></div></div>
+  <div id="progress-text"></div>
+</div>
 
 <div id="input-row">
   <input id="todo-input" type="text" placeholder="할 일을 입력하세요">
@@ -146,7 +191,12 @@
   <button id="add-btn">추가</button>
 </div>
 
-<div id="filters"></div>
+<div id="filters">
+  <button data-filter="all">전체</button>
+  <button data-filter="work">업무</button>
+  <button data-filter="personal">개인</button>
+  <button data-filter="study">공부</button>
+</div>
 
 <ul id="todo-list"></ul>
 
@@ -212,19 +262,38 @@
     render();
   }
 
+  function getVisibleTodos() {
+    if (currentFilter === "all") return todos;
+    return todos.filter(function (t) { return t.category === currentFilter; });
+  }
+
+  function renderProgress() {
+    const visible = getVisibleTodos();
+    const total = visible.length;
+    const done = visible.filter(function (t) { return t.done; }).length;
+    const percent = total === 0 ? 0 : Math.round((done / total) * 100);
+
+    document.getElementById("progress-fill").style.width = percent + "%";
+    document.getElementById("progress-text").textContent =
+      done + " / " + total + " (" + percent + "%)";
+  }
+
   function renderList() {
     const list = document.getElementById("todo-list");
+    const visible = getVisibleTodos();
     list.innerHTML = "";
 
-    if (todos.length === 0) {
+    if (visible.length === 0) {
       const empty = document.createElement("li");
       empty.className = "empty";
-      empty.textContent = "할 일을 추가해 보세요";
+      empty.textContent = currentFilter === "all"
+        ? "할 일을 추가해 보세요"
+        : "이 카테고리에는 할 일이 없습니다";
       list.append(empty);
       return;
     }
 
-    todos.forEach(function (todo) {
+    visible.forEach(function (todo) {
       const li = document.createElement("li");
       li.dataset.id = todo.id;
 
@@ -252,6 +321,10 @@
   }
 
   function render() {
+    document.querySelectorAll("#filters button").forEach(function (btn) {
+      btn.classList.toggle("active", btn.dataset.filter === currentFilter);
+    });
+    renderProgress();
     renderList();
   }
 
@@ -265,6 +338,14 @@
     const id = e.target.closest("li").dataset.id;
     if (action === "toggle") toggleTodo(id);
     else if (action === "delete") deleteTodo(id);
+  });
+
+  document.getElementById("filters").addEventListener("click", function (e) {
+    const filter = e.target.dataset.filter;
+    if (!filter) return;
+
+    currentFilter = filter;
+    render();
   });
 
   document.getElementById("todo-input").addEventListener("keydown", function (e) {
