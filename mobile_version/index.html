@@ -1,4 +1,4 @@
-<!-- 2026-08-09 19:53 KST -->
+<!-- 2026-08-09 17:18 KST -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>할 일 관리</title>
@@ -13,21 +13,13 @@
   }
 
   body {
-    margin: 0;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 32px 20px 64px;
     font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
                  "Malgun Gothic", sans-serif;
     color: #22262b;
     line-height: 1.6;
-  }
-
-  /* 좁은 화면에서는 한 줄로 쌓이고, 넓어지면 사이드바와 목록 2단이 된다 */
-  .app {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 32px 20px 64px;
   }
 
   h1 {
@@ -36,7 +28,8 @@
   }
 
   #progress,
-  #input-row {
+  #input-row,
+  #filters {
     margin-bottom: 16px;
   }
 
@@ -60,37 +53,8 @@
     font-size: 14px;
   }
 
-  #input-row {
-    display: flex;
-    gap: 8px;
-  }
-
-  #todo-input {
-    flex: 1;
-    min-width: 0;
-  }
-
-  #input-row input,
-  #input-row select,
-  #input-row button {
-    padding: 8px 12px;
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    font-size: 15px;
-    font-family: inherit;
-  }
-
-  #add-btn {
-    flex: none;
-    border-color: var(--work);
-    background: var(--work);
-    color: #fff;
-    cursor: pointer;
-  }
-
   #filters {
     display: flex;
-    flex-wrap: wrap;
     gap: 6px;
   }
 
@@ -131,14 +95,6 @@
     background: #fafbfc;
   }
 
-  #todo-list li.empty {
-    display: block;
-    padding: 32px 0;
-    border-bottom: none;
-    color: var(--muted);
-    text-align: center;
-  }
-
   .todo-text {
     flex: 1;
     min-width: 0;
@@ -156,21 +112,6 @@
     height: 17px;
     cursor: pointer;
   }
-
-  .badge {
-    flex: none;
-    min-width: 46px;
-    padding: 2px 10px;
-    border-radius: 999px;
-    font-size: 12px;
-    color: #fff;
-    text-align: center;
-    white-space: nowrap;
-  }
-
-  .badge-work { background: var(--work); }
-  .badge-personal { background: var(--personal); }
-  .badge-study { background: var(--study); }
 
   .row-btn {
     flex: none;
@@ -208,74 +149,83 @@
     font-family: inherit;
   }
 
-  @media (min-width: 900px) {
-    .app {
-      grid-template-columns: 300px 1fr;
-      gap: 40px;
-      align-items: start;
-      padding: 48px 40px 80px;
-    }
+  .badge {
+    flex: none;
+    min-width: 46px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+  }
 
-    /* 목록을 스크롤해도 입력줄과 진행률은 자리를 지킨다 */
-    .side {
-      position: sticky;
-      top: 48px;
-      border-right: 1px solid var(--line);
-      padding-right: 40px;
-    }
+  .badge-work { background: var(--work); }
+  .badge-personal { background: var(--personal); }
+  .badge-study { background: var(--study); }
 
-    h1 {
-      font-size: 28px;
-    }
+  #input-row {
+    display: flex;
+    gap: 8px;
+  }
 
-    /* 사이드바가 좁으므로 입력줄은 세로로 쌓는다 */
-    #input-row {
-      flex-direction: column;
-    }
+  #todo-input {
+    flex: 1;
+    min-width: 0;
+  }
 
-    #todo-list li {
-      gap: 14px;
-      min-height: 58px;
-      padding: 8px 6px;
-    }
+  #input-row input,
+  #input-row select,
+  #input-row button {
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-size: 15px;
+    font-family: inherit;
+  }
 
-    .todo-text {
-      font-size: 16px;
-    }
+  #add-btn {
+    flex: none;
+    border-color: var(--work);
+    background: var(--work);
+    color: #fff;
+    cursor: pointer;
+  }
+
+  #todo-list li.empty {
+    display: block;
+    padding: 32px 0;
+    border-bottom: none;
+    color: var(--muted);
+    text-align: center;
   }
 </style>
 
-<div class="app">
-  <aside class="side">
-    <h1>할 일 관리</h1>
+<h1>할 일 관리</h1>
 
-    <div id="progress">
-      <div id="progress-bar"><div id="progress-fill"></div></div>
-      <div id="progress-text"></div>
-    </div>
-
-    <div id="input-row">
-      <input id="todo-input" type="text" placeholder="할 일을 입력하세요">
-      <select id="category-select">
-        <option value="work">업무</option>
-        <option value="personal">개인</option>
-        <option value="study">공부</option>
-      </select>
-      <button id="add-btn">추가</button>
-    </div>
-
-    <div id="filters">
-      <button data-filter="all">전체</button>
-      <button data-filter="work">업무</button>
-      <button data-filter="personal">개인</button>
-      <button data-filter="study">공부</button>
-    </div>
-  </aside>
-
-  <main class="main">
-    <ul id="todo-list"></ul>
-  </main>
+<div id="progress">
+  <div id="progress-bar"><div id="progress-fill"></div></div>
+  <div id="progress-text"></div>
 </div>
+
+<div id="input-row">
+  <input id="todo-input" type="text" placeholder="할 일을 입력하세요">
+  <select id="category-select">
+    <option value="work">업무</option>
+    <option value="personal">개인</option>
+    <option value="study">공부</option>
+  </select>
+  <button id="add-btn">추가</button>
+</div>
+
+<div id="filters">
+  <button data-filter="all">전체</button>
+  <button data-filter="work">업무</button>
+  <button data-filter="personal">개인</button>
+  <button data-filter="study">공부</button>
+</div>
+
+<ul id="todo-list"></ul>
 
 <script>
   const STORAGE_KEY = "todoApp.v1";
