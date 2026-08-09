@@ -54,6 +54,34 @@
     word-break: break-word;
   }
 
+  .todo-text.done {
+    color: var(--muted);
+    text-decoration: line-through;
+  }
+
+  #todo-list input[type="checkbox"] {
+    flex: none;
+    width: 17px;
+    height: 17px;
+    cursor: pointer;
+  }
+
+  .row-btn {
+    flex: none;
+    padding: 4px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: #fff;
+    color: #4a5058;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  .row-btn:hover {
+    border-color: var(--muted);
+  }
+
   .badge {
     flex: none;
     padding: 2px 10px;
@@ -170,6 +198,20 @@
     input.focus();
   }
 
+  function toggleTodo(id) {
+    const todo = todos.find(function (t) { return t.id === id; });
+    todo.done = !todo.done;
+    saveTodos();
+    render();
+  }
+
+  function deleteTodo(id) {
+    if (!confirm("이 할 일을 삭제할까요?")) return;
+    todos = todos.filter(function (t) { return t.id !== id; });
+    saveTodos();
+    render();
+  }
+
   function renderList() {
     const list = document.getElementById("todo-list");
     list.innerHTML = "";
@@ -184,16 +226,27 @@
 
     todos.forEach(function (todo) {
       const li = document.createElement("li");
+      li.dataset.id = todo.id;
+
+      const check = document.createElement("input");
+      check.type = "checkbox";
+      check.checked = todo.done;
+      check.dataset.action = "toggle";
 
       const text = document.createElement("span");
-      text.className = "todo-text";
+      text.className = todo.done ? "todo-text done" : "todo-text";
       text.textContent = todo.text;
 
       const badge = document.createElement("span");
       badge.className = "badge badge-" + todo.category;
       badge.textContent = CATEGORY_LABELS[todo.category];
 
-      li.append(text, badge);
+      const del = document.createElement("button");
+      del.className = "row-btn";
+      del.dataset.action = "delete";
+      del.textContent = "삭제";
+
+      li.append(check, text, badge, del);
       list.append(li);
     });
   }
@@ -203,6 +256,16 @@
   }
 
   document.getElementById("add-btn").addEventListener("click", addTodo);
+
+  // 목록 안의 클릭은 여기 한 곳에서만 처리한다 (이벤트 위임)
+  document.getElementById("todo-list").addEventListener("click", function (e) {
+    const action = e.target.dataset.action;
+    if (!action) return;
+
+    const id = e.target.closest("li").dataset.id;
+    if (action === "toggle") toggleTodo(id);
+    else if (action === "delete") deleteTodo(id);
+  });
 
   document.getElementById("todo-input").addEventListener("keydown", function (e) {
     if (e.key === "Enter") addTodo();
