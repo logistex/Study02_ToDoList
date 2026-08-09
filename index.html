@@ -86,8 +86,13 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 12px 4px;
+    min-height: 52px;
+    padding: 6px 4px;
     border-bottom: 1px solid var(--line);
+  }
+
+  #todo-list li:not(.empty):hover {
+    background: #fafbfc;
   }
 
   .todo-text {
@@ -124,12 +129,34 @@
     border-color: var(--muted);
   }
 
+  .edit-input {
+    flex: 1;
+    min-width: 0;
+    padding: 6px 8px;
+    border: 1px solid var(--work);
+    border-radius: 6px;
+    font-size: 15px;
+    font-family: inherit;
+  }
+
+  .edit-select {
+    flex: none;
+    min-width: 46px;
+    padding: 5px 4px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+  }
+
   .badge {
     flex: none;
+    min-width: 46px;
     padding: 2px 10px;
     border-radius: 999px;
     font-size: 12px;
     color: #fff;
+    text-align: center;
     white-space: nowrap;
   }
 
@@ -262,6 +289,25 @@
     render();
   }
 
+  function saveEdit(id) {
+    const li = document.querySelector('#todo-list li[data-id="' + id + '"]');
+    const input = li.querySelector(".edit-input");
+    const text = input.value.trim();
+
+    if (text === "") {
+      input.focus();
+      return;
+    }
+
+    const todo = todos.find(function (t) { return t.id === id; });
+    todo.text = text;
+    todo.category = li.querySelector(".edit-select").value;
+
+    editingId = null;
+    saveTodos();
+    render();
+  }
+
   function getVisibleTodos() {
     if (currentFilter === "all") return todos;
     return todos.filter(function (t) { return t.category === currentFilter; });
@@ -301,23 +347,66 @@
       check.type = "checkbox";
       check.checked = todo.done;
       check.dataset.action = "toggle";
+      // 편집 중에 체크하면 다시 그려지면서 입력하던 내용이 날아간다
+      check.disabled = todo.id === editingId;
 
-      const text = document.createElement("span");
-      text.className = todo.done ? "todo-text done" : "todo-text";
-      text.textContent = todo.text;
-
-      const badge = document.createElement("span");
-      badge.className = "badge badge-" + todo.category;
-      badge.textContent = CATEGORY_LABELS[todo.category];
-
-      const del = document.createElement("button");
-      del.className = "row-btn";
-      del.dataset.action = "delete";
-      del.textContent = "삭제";
-
-      li.append(check, text, badge, del);
+      li.append(check, ...(todo.id === editingId ? editCells(todo) : normalCells(todo)));
       list.append(li);
     });
+
+    const editInput = list.querySelector(".edit-input");
+    if (editInput) editInput.focus();
+  }
+
+  function normalCells(todo) {
+    const text = document.createElement("span");
+    text.className = todo.done ? "todo-text done" : "todo-text";
+    text.textContent = todo.text;
+
+    const badge = document.createElement("span");
+    badge.className = "badge badge-" + todo.category;
+    badge.textContent = CATEGORY_LABELS[todo.category];
+
+    const edit = document.createElement("button");
+    edit.className = "row-btn";
+    edit.dataset.action = "edit";
+    edit.textContent = "수정";
+
+    const del = document.createElement("button");
+    del.className = "row-btn";
+    del.dataset.action = "delete";
+    del.textContent = "삭제";
+
+    return [text, badge, edit, del];
+  }
+
+  function editCells(todo) {
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "edit-input";
+    input.value = todo.text;
+
+    const select = document.createElement("select");
+    select.className = "edit-select";
+    Object.keys(CATEGORY_LABELS).forEach(function (key) {
+      const option = document.createElement("option");
+      option.value = key;
+      option.textContent = CATEGORY_LABELS[key];
+      select.append(option);
+    });
+    select.value = todo.category;
+
+    const save = document.createElement("button");
+    save.className = "row-btn";
+    save.dataset.action = "save";
+    save.textContent = "저장";
+
+    const cancel = document.createElement("button");
+    cancel.className = "row-btn";
+    cancel.dataset.action = "cancel";
+    cancel.textContent = "취소";
+
+    return [input, select, save, cancel];
   }
 
   function render() {
@@ -338,6 +427,18 @@
     const id = e.target.closest("li").dataset.id;
     if (action === "toggle") toggleTodo(id);
     else if (action === "delete") deleteTodo(id);
+    else if (action === "edit") { editingId = id; render(); }
+    else if (action === "save") saveEdit(id);
+    else if (action === "cancel") { editingId = null; render(); }
+  });
+
+  // 편집 입력창의 Enter와 Esc도 같은 방식으로 위임해서 받는다
+  document.getElementById("todo-list").addEventListener("keydown", function (e) {
+    if (!e.target.classList.contains("edit-input")) return;
+
+    const id = e.target.closest("li").dataset.id;
+    if (e.key === "Enter") saveEdit(id);
+    else if (e.key === "Escape") { editingId = null; render(); }
   });
 
   document.getElementById("filters").addEventListener("click", function (e) {
