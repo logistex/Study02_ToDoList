@@ -6,11 +6,9 @@
 
 서버도 계정도 빌드 도구도 없다. HTML 파일 하나를 브라우저로 열면 실행되고, 데이터는 브라우저의 localStorage에 남는다.
 
-## 실행
+## 실행 방법
 
-**https://logistex.github.io/Study02_ToDoList/**
-
-내려받아 쓰려면 [index.html](index.html) 하나만 있으면 된다. 파일을 브라우저로 열면 그대로 실행된다. 설치할 것도, 띄울 서버도 없다.
+[index.html](index.html)을 내려받아 브라우저로 열면 된다. 설치할 것도, 띄울 서버도 없다.
 
 ## 기능
 
@@ -28,12 +26,6 @@
 - 파일 구성: `index.html` 하나. CSS와 자바스크립트를 같은 파일 안에 둔다
 - 상태 변경은 언제나 `배열 변경 → saveTodos() → render()` 순서로만 일어난다. DOM을 부분적으로 고치지 않아 화면과 데이터가 어긋나지 않는다
 
-## 데이터
-
-localStorage 키 `todoApp.v1`에 JSON 하나로 저장한다. 브라우저를 벗어나지 않으며 어디로도 전송되지 않는다.
-
-브라우저마다 저장소가 따로이므로, 크롬에서 적은 할 일은 사파리에서 보이지 않는다.
-
 ## 문서
 
 - [PRD.md](PRD.md) — 요구사항, 데이터 모델, 화면 설계, 완료 기준
@@ -49,4 +41,3 @@ localStorage 키 `todoApp.v1`에 JSON 하나로 저장한다. 브라우저를 �
 
 - [README-v1.md](README-v1.md) — PRD만 있던 시점
 - [README-v2.md](README-v2.md) — PRD와 구현 계획까지 끝난 시점
-- [README-v3.md](README-v3.md) — 구현은 끝났고 배포 전인 시점
