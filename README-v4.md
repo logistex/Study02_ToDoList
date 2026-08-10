@@ -10,12 +10,6 @@
 
 **https://logistex.github.io/Study02_ToDoList/**
 
-넓은 화면에서는 왼쪽에 진행률과 입력줄, 필터를 모은 사이드바를 두고 오른쪽에 목록을 보여 준다. 창을 좁히면 한 줄 배치로 바뀐다.
-
-처음 만든 좁은 화면 전용 버전도 남겨 두었다.
-
-- **https://logistex.github.io/Study02_ToDoList/mobile_version/** — 폭 600px 한 줄 배치
-
 내려받아 쓰려면 [index.html](index.html) 하나만 있으면 된다. 파일을 브라우저로 열면 그대로 실행된다. 설치할 것도, 띄울 서버도 없다.
 
 ## 기능
@@ -27,23 +21,18 @@
 - 진행률 보기 (현재 선택된 필터 기준)
 - 새로고침해도 유지되는 저장
 
-두 버전의 기능은 같다. 화면 배치만 다르다.
-
 ## 기술 스택
 
 - HTML, CSS, 순수 자바스크립트
 - 라이브러리와 프레임워크 없음
-- 파일 구성: HTML 하나에 CSS와 자바스크립트를 같이 담는다
-  - [index.html](index.html) — 데스크톱 2단 배치
-  - [mobile_version/index.html](mobile_version/index.html) — 처음 만든 한 줄 배치
-- 두 파일의 자바스크립트는 동일하다. 배치를 바꾸면서 CSS와 마크업만 손봤다
+- 파일 구성: `index.html` 하나. CSS와 자바스크립트를 같은 파일 안에 둔다
 - 상태 변경은 언제나 `배열 변경 → saveTodos() → render()` 순서로만 일어난다. DOM을 부분적으로 고치지 않아 화면과 데이터가 어긋나지 않는다
 
 ## 데이터
 
 localStorage 키 `todoApp.v1`에 JSON 하나로 저장한다. 브라우저를 벗어나지 않으며 어디로도 전송되지 않는다.
 
-브라우저마다 저장소가 따로이므로, 크롬에서 적은 할 일은 사파리에서 보이지 않는다. 두 버전은 같은 주소(`logistex.github.io`)에서 돌아가므로 저장소를 공유한다. 한쪽에서 적은 할 일이 다른 쪽에도 그대로 보인다.
+브라우저마다 저장소가 따로이므로, 크롬에서 적은 할 일은 사파리에서 보이지 않는다.
 
 ## 문서
 
@@ -61,4 +50,3 @@ localStorage 키 `todoApp.v1`에 JSON 하나로 저장한다. 브라우저를 �
 - [README-v1.md](README-v1.md) — PRD만 있던 시점
 - [README-v2.md](README-v2.md) — PRD와 구현 계획까지 끝난 시점
 - [README-v3.md](README-v3.md) — 구현은 끝났고 배포 전인 시점
-- [README-v4.md](README-v4.md) — 배포까지 끝나고 데스크톱 버전 전인 시점
